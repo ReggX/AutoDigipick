@@ -4,4 +4,5 @@ numpy==1.25.2
 opencv-python==4.8.0.76
 packaging==23.1
 Pillow==10.0.0
+pydirectinput-rgx==2.0.8
 pytesseract==0.3.10

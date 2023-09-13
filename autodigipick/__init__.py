@@ -8,6 +8,7 @@ import keyboard
 import mss
 import numpy as np
 import pytesseract
+import pydirectinput
 
 
 DEFAULT_CONFIG = '''
@@ -21,7 +22,21 @@ monitor_id = 3
 # Hotkey detection is using the keyboard PyPI package
 # https://github.com/boppreh/keyboard
 solve = "F13"
-exit = "F14"
+autoinput = "F14"
+exit = "F15"
+
+
+[bindings]
+# Ingame key binding for rotating picks left
+rotate_left = "a"
+# Ingame key binding for rotating picks right
+rotate_right = "d"
+# Ingame key binding for selecting the previous pick
+previous_pick = "q"
+# Ingame key binding for selecting the next pick
+next_pick = "t"
+# Ingame key binding for selecting the pick
+select_pick = "e"
 
 
 [display]
@@ -143,7 +158,16 @@ class CaptureConfig(TypedDict):
 
 class HotkeyConfig(TypedDict):
   solve: str
+  autoinput: str
   exit: str
+
+
+class BindingsConfig(TypedDict):
+  rotate_left: str
+  rotate_right: str
+  previous_pick: str
+  next_pick: str
+  select_pick: str
 
 
 class DisplayConfig(TypedDict):
@@ -193,6 +217,7 @@ class PicksConfig(TypedDict):
 class ConfigDict(TypedDict):
   capture: CaptureConfig
   hotkey: HotkeyConfig
+  bindings: BindingsConfig
   display: DisplayConfig
   general: GeneralConfig
   security_level: SecurityLevelConfig
@@ -337,7 +362,7 @@ def detect_security_level(
   return pytesseract.image_to_string(thresh_roi)
 
 
-def solve_lock(cfg: ConfigDict):
+def solve_lock(cfg: ConfigDict, autoinput: bool = False):
   NUM_SEGMENTS = cfg["general"]["num_segments"]
   # Locks
   LOCK_SEGMENT_BOX = cfg["locks"]["box_size"]
@@ -361,6 +386,8 @@ def solve_lock(cfg: ConfigDict):
 
   locks = []
   digipicks = []
+  active_pick = 0
+  potential_picks = 0
 
   with mss.mss() as sct:
     mon = sct.monitors[monitor_id]
@@ -475,7 +502,7 @@ def solve_lock(cfg: ConfigDict):
     ][:potential_picks]
 
     # print("Digipicks")
-    for pick_pos in pick_positions:
+    for i, pick_pos in enumerate(pick_positions):
       # Define the number of segments and the angle step size
       angle_step = 2 * np.pi / NUM_SEGMENTS
       # Create an array of angles for each segment
@@ -497,10 +524,21 @@ def solve_lock(cfg: ConfigDict):
         )[0]
         for i in range(NUM_SEGMENTS)
       )
-      # print(tuple(
-      #   f"{segment:>4.1f}"
-      #   for segment in segments
-      # ))
+
+      def get_center_region(image):
+        y_start = int(pick_pos[1]) - PICK_SEGMENT_BOX[1]
+        y_end = int(pick_pos[1]) + PICK_SEGMENT_BOX[1]
+        x_start = int(pick_pos[0]) - PICK_SEGMENT_BOX[0]
+        x_end = int(pick_pos[0]) + PICK_SEGMENT_BOX[0]
+        return image[y_start:y_end, x_start:x_end]
+
+      center_brightness = (
+        cv2.mean(
+          cv2.cvtColor(get_center_region(scaled_image), cv2.COLOR_BGR2GRAY)
+        )[0]
+      )
+      if center_brightness > 120:
+        active_pick = i
 
       threshold = (max(segments) + min(segments)) / 2
 
@@ -512,8 +550,6 @@ def solve_lock(cfg: ConfigDict):
       digipicks += [delta]
 
     solution = brute_force(locks, digipicks, [], 0)
-    # print(solution)
-
 
   if solution:
     for i, (pick_num, rotation, lock_depth) in enumerate(solution):
@@ -606,6 +642,44 @@ def solve_lock(cfg: ConfigDict):
   scaled_image = cv2.resize(scaled_image, window_resolution)
   cv2.imshow(title, scaled_image)
 
+  if autoinput and solution:
+    cv2.waitKey(10)
+    ROTATE_LEFT = cfg["bindings"]["rotate_left"]
+    ROTATE_RIGHT = cfg["bindings"]["rotate_right"]
+    PREVIOUS_PICK = cfg["bindings"]["previous_pick"]
+    NEXT_PICK = cfg["bindings"]["next_pick"]
+    SELECT_PICK = cfg["bindings"]["select_pick"]
+    available_picks = [1 for _ in range(potential_picks)]
+    for j, (pick_num, rotation, lock_depth) in enumerate(solution):
+      if pick_num >= active_pick:
+        for i in range(active_pick, pick_num, 1):
+          if available_picks[i+1]:
+            pydirectinput.press(NEXT_PICK, _pause=False, duration=0.05)
+            cv2.waitKey(50)
+      else:
+        for i in range(active_pick, pick_num, -1):
+          if available_picks[i-1]:
+            pydirectinput.press(PREVIOUS_PICK, _pause=False, duration=0.05)
+            cv2.waitKey(50)
+      cv2.waitKey(50)
+      if rotation > NUM_SEGMENTS // 2:
+        rotation = NUM_SEGMENTS - rotation
+        rotate = ROTATE_RIGHT
+      else:
+        rotate = ROTATE_LEFT
+      for _ in range(rotation):
+        pydirectinput.press(rotate, _pause=False, duration=0.05)
+        cv2.waitKey(50)
+      pydirectinput.press(SELECT_PICK, _pause=False, duration=0.05)
+      cv2.waitKey(100)
+      available_picks[pick_num] = 0
+      # active_pick switches to the next pick after pick_num, skipping all used picks
+      for i in range(potential_picks):
+        pick = (pick_num + i) % potential_picks
+        if available_picks[pick]:
+          active_pick = pick
+          break
+
 
 def run_AutoDigipick(
   config_path: str = "autodigipick.toml"
@@ -614,6 +688,7 @@ def run_AutoDigipick(
   window_position = cfg["display"]["position"]
   title = cfg["display"]["title"]
   solve_key = cfg["hotkey"]["solve"]
+  autoinput_key = cfg["hotkey"]["autoinput"]
   exit_key = cfg["hotkey"]["exit"]
   cv2.startWindowThread()
   # Create a named window
@@ -628,6 +703,9 @@ def run_AutoDigipick(
       keep_running = False
       return
     if keyboard.is_pressed(solve_key):
-      solve_lock(cfg)
+      solve_lock(cfg, autoinput=False)
+      cv2.waitKey(10)
+    if keyboard.is_pressed(autoinput_key):
+      solve_lock(cfg, autoinput=True)
       cv2.waitKey(10)
     cv2.waitKey(10)

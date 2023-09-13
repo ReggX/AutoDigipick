@@ -8,7 +8,21 @@ monitor_id = 3
 # Hotkey detection is using the keyboard PyPI package
 # https://github.com/boppreh/keyboard
 solve = "F13"
-exit = "F14"
+autoinput = "F14"
+exit = "F15"
+
+
+[bindings]
+# Ingame key binding for rotating picks left
+rotate_left = "a"
+# Ingame key binding for rotating picks right
+rotate_right = "d"
+# Ingame key binding for selecting the previous pick
+previous_pick = "q"
+# Ingame key binding for selecting the next pick
+next_pick = "t"
+# Ingame key binding for selecting the pick
+select_pick = "e"
 
 
 [display]

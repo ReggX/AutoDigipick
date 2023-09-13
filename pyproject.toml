@@ -1,6 +1,6 @@
 [project]
 name = "autodigipick"
-version = "1.0.1"
+version = "1.1.1"
 description = "Automatically solve Starfield Digipick puzzles with the press of a button."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -26,6 +26,7 @@ dependencies = [
   "keyboard",
   "mss",
   "numpy",
+  "pydirectinput-rgx",
   "pytesseract",
 ]
 
