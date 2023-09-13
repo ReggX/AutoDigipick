@@ -1,22 +1,14 @@
 [project]
 name = "autodigipick"
-
-version = "1.0.0"
-
+version = "1.0.1"
 description = "Automatically solve Starfield Digipick puzzles with the press of a button."
-
 readme = "README.md"
-
 requires-python = ">=3.8"
-
 license = {file = "LICENSE.txt"}
-
 keywords = ["Starfield", "solver", "OpenCV"]
-
 authors = [
   {name = "ReggX", email = "dev@reggx.eu" }
 ]
-
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: End Users/Desktop",
@@ -29,7 +21,6 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3 :: Only",
 ]
-
 dependencies = [
   "opencv-python",
   "keyboard",
@@ -42,11 +33,8 @@ dependencies = [
 "Homepage" = "https://github.com/reggx/autodigipick"
 
 [project.scripts]
-sample = "autodigipick:run_AutoDigipick"
-
-[tool.setuptools]
-package-data = ["*.toml"]
+autodigipick = "autodigipick:run_AutoDigipick"
 
 [build-system]
-requires = ["setuptools>=43.0.0", "wheel"]
+requires = ["setuptools>=61.2", "wheel"]
 build-backend = "setuptools.build_meta"
