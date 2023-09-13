@@ -5,6 +5,8 @@ Digipick puzzles in Bethesda's Starfield are fun to solve, but they can be tedio
 Using OpenCV and Tesseract, the script takes a screenshot of the puzzle, identifies the symbols, and solves the puzzle. It then displays the solution in an extra window which you can display on a second monitor for quick reference.
 
 
+![Example image showing the game on top screen and the solution on secondary monitor](example.jpg)
+
 # Installation
 
 You will need to install [Tesseract](https://tesseract-ocr.github.io/tessdoc/Installation.html) and add the path to the tesseract executable to your PATH environment variable.
