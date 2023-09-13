@@ -15,6 +15,15 @@ If you use the packed executable release of AutoDigipick, then you can start it 
 
 Otherwise, you will need to install [Python](https://www.python.org/downloads/) and install the dependencies listed in requirements.txt. Then you can run the script with `python autodigipick.py`.
 
+Alternatively, you can install the package with pip (Recommended in a virtual environment or using tools like pipx):
+
+```cmd
+pip install autodigipick
+```
+
+and use `autodigipick.exe` to run the script. The configuration file will be created in the active directory and you can modify it to your needs.
+
+
 
 ## Usage
 
@@ -30,7 +39,7 @@ monitor_id = 3  # Change to your monitor's ID
 ```toml
 [hotkey]
 solve = "F13"  # I use macro keys on my keyboard, but you can use any key you want
-exit = "F14"  # it also supports combinations like "ctrl+shift+alt+q"
+exit = "F14"  # it also supports combinations with + like "ctrl+shift+alt+q"
 ```
 
 ```toml
