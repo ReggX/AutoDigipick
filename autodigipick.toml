@@ -1,0 +1,123 @@
+[capture]
+# Id of the monitor to capture,
+# just experiment with it until you get the right one
+monitor_id = 3
+
+
+[hotkey]
+# Hotkey detection is using the keyboard PyPI package
+# https://github.com/boppreh/keyboard
+solve = "F13"
+exit = "F14"
+
+
+[display]
+# Window Title of the solved image window
+title = "AutoDigipick"
+# Window Resolution of the solved image window
+resolution = [1920, 1080]
+# Window Position of solved image window, offset from top left corner
+# of the primary monitor
+position = [1000, 2300]
+
+
+[general]
+# Number of circle segments, unless Bethesda does something wild, don't change this
+num_segments = 32
+# ID of the font to use for the display text
+# FONT_HERSHEY_SIMPLEX = 0
+# FONT_HERSHEY_PLAIN = 1
+# FONT_HERSHEY_DUPLEX = 2
+# FONT_HERSHEY_COMPLEX = 3
+# FONT_HERSHEY_TRIPLEX = 4
+# FONT_HERSHEY_COMPLEX_SMALL = 5
+# FONT_HERSHEY_SCRIPT_SIMPLEX = 6
+# FONT_HERSHEY_SCRIPT_COMPLEX = 7
+font = 2  # cv2.FONT_HERSHEY_DUPLEX
+# Scale factor of the display text
+font_scale = 1
+# Thickness of the display text
+thickness = 2
+# Color rotation for digipicks used in solution (BGR)
+# if the solution requires more picks than colors, the colors will be reused
+# in order
+colors = [
+  [0, 0, 255],
+  [0, 255, 255],
+  [0, 255, 0],
+  [255, 255, 0],
+  [255, 0, 0],
+  [255, 0, 255]
+]
+
+
+[security_level]
+# Location of the security level text (top left corner)
+# NOTE: AFTER normalization to 1920x1080
+location = [1420, 250]
+# Size of the security level text (bounding box)
+# NOTE: AFTER normalization to 1920x1080
+box_size = [200, 40]
+# Lower threshold for masking only the security level text (BGR)
+lower_threshold = [10, 50, 220]
+# Upper threshold for masking only the security level text (BGR)
+upper_threshold = [20, 70, 230]
+
+
+[locks]
+# Region size used to detect the presence/absence of circle segments
+# NOTE: AFTER normalization to 1920x1080
+box_size = [5, 5]
+# Center of the lock circle (most likely the very center of the screen)
+# NOTE: AFTER normalization to 1920x1080
+center = [960, 540]
+# Radius of the different lock circles
+# NOTE: AFTER normalization to 1920x1080
+bright_radii = [105, 133, 170, 208]
+# Radius of the different lock circles offset by a small amount to detect the
+# relative difference in brightness between the circle segments and the rest
+# NOTE: AFTER normalization to 1920x1080
+dark_radii = [90, 117, 151, 186]
+
+
+[picks]
+# Region size used to detect the presence/absence of circle segments
+# NOTE: AFTER normalization to 1920x1080
+box_size = [2, 2]
+# Offset from the top left digipick to the next digipick (right)
+# NOTE: AFTER normalization to 1920x1080
+step_right = 112.5
+# Offset from the top left digipick to the next digipick (down)
+# NOTE: AFTER normalization to 1920x1080
+step_down = 110.5
+# Radius of the digipick circle
+# NOTE: AFTER normalization to 1920x1080
+radius = 39
+
+[picks.novice]
+# Center of the top left digipick
+# NOTE: AFTER normalization to 1920x1080
+center = [1405, 561]
+# Number of digipicks available for the given difficulty
+count = 4
+
+[picks.advanced]
+# Center of the top left digipick
+# NOTE: AFTER normalization to 1920x1080
+center = [1405, 511]
+# Number of digipicks available for the given difficulty
+count = 6
+
+[picks.expert]
+# Center of the top left digipick
+# NOTE: AFTER normalization to 1920x1080
+center = [1405, 460]
+# Number of digipicks available for the given difficulty
+count = 9
+
+[picks.master]
+# Center of the top left digipick
+# NOTE: AFTER normalization to 1920x1080
+center = [1405, 460]
+# Number of digipicks available for the given difficulty
+count = 12
